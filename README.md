@@ -14,4 +14,35 @@ The UK Citizenship application has several eligibility requirements that must be
 
 ## Usage
 
-TBD
+```
+python3 src.py -f example/data.txt
+```
+
+ALL DATES:
+=======================================================
+
+| Start Date  | End Date    | Total Days Outside UK | Full Days Outside UK |
+| 12 Dec 2023 | 14 Dec 2023 |                     3 |                    1 |
+| 27 Dec 2023 | 11 Jan 2024 |                    16 |                   14 |
+| 22 Feb 2024 | 24 Feb 2024 |                     3 |                    1 |
+| 24 Feb 2024 | 27 Feb 2024 |                     4 |                    2 |
+
+Total Days Outside UK: 26
+Full Days Outside UK: 18
+
+=======================================================
+
+PAST YEAR DATES:
+=======================================================
+
+| Start Date  | End Date    | Total Days Outside UK | Full Days Outside UK |
+| 27 Dec 2023 | 11 Jan 2024 |                    16 |                   14 |
+| 22 Feb 2024 | 24 Feb 2024 |                     3 |                    1 |
+| 24 Feb 2024 | 27 Feb 2024 |                     4 |                    2 |
+
+Total Days Outside UK: 23
+Full Days Outside UK: 17
+
+=======================================================
+
+*Note: the day one year ago is computed by substracting from the current date 365 days*
