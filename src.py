@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def parse_date(date_str: str) -> datetime:
@@ -18,6 +18,11 @@ def parse_dates(filepath: str) -> list[tuple[datetime, datetime]]:
         start_date, end_date = line.split("-")
         start_date = parse_date(start_date)
         end_date = parse_date(end_date)
+
+        assert (
+            start_date <= end_date
+        ), f"Start date {start_date} is after end date {end_date}"
+
         dates.append((start_date, end_date))
 
     return dates
@@ -41,6 +46,10 @@ def main() -> None:
     total_days = 0
     total_full_days = 0  # The government website only counts full days
 
+    total_days_past_year = 0
+    total_full_days_past_year = 0
+    day_one_year_ago = datetime.now() - timedelta(days=365)
+
     print()
     print("-" * 50)
     print("Computations:")
@@ -54,10 +63,21 @@ def main() -> None:
         total_days += (end_date - start_date).days + 1
         total_full_days += (end_date - start_date).days
 
+        if end_date >= day_one_year_ago:
+            total_days_past_year += (
+                end_date - max(start_date, day_one_year_ago)
+            ).days + 1
+            total_full_days_past_year += (
+                end_date - max(start_date, day_one_year_ago)
+            ).days
+
     print()
     print("-" * 50)
     print(
         f"Total full days spent outside of the UK: {total_full_days} ({total_days} including travel days)"
+    )
+    print(
+        f"Total full days spent outside of the UK in the past year: {total_full_days_past_year} ({total_days_past_year} including travel days)"
     )
     print("-" * 50)
 
