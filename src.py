@@ -62,56 +62,88 @@ def parse_dates(filepath: str) -> list[tuple[datetime, datetime]]:
 
 
 @dataclass
-class DaysSummary:
-    total_days: int
-    total_full_days: int
-    total_days_past_year: int
-    total_full_days_past_year: int
+class TravelLog:
+    start_date: datetime
+    end_date: datetime
+    total_days_outside: int
+    full_days_outside: int
 
 
-def compute_days_summary(dates: list[tuple[datetime, datetime]]) -> DaysSummary:
-    """
-    Compute the total number of days spent outside of the UK as provided in the input file.
-    Args:
-        dates (list[tuple[datetime, datetime]]): A list of tuples, where each tuple contains the start and end dates as datetime objects.
-    Returns:
-        DaysSummary: An object containing the total number of days spent outside of the UK.
-    """
-
-    total_days = 0
-    total_full_days = 0  # The government website only counts full days
-
-    total_days_past_year = 0
-    total_full_days_past_year = 0
-    day_one_year_ago = datetime.now() - timedelta(days=365)
-
-    print()
-    print("-" * 50)
-    print("Computations:")
-    print("-" * 50)
-    print()
-
-    for start_date, end_date in dates:
-        print(f"Start date: {start_date.date()}, end date: {end_date.date()}")
-        print(f"Full days spent outside of the UK: {(end_date - start_date).days}")
-
-        total_days += (end_date - start_date).days + 1
-        total_full_days += (end_date - start_date).days
-
-        if end_date >= day_one_year_ago:
-            total_days_past_year += (
-                end_date - max(start_date, day_one_year_ago)
-            ).days + 1
-            total_full_days_past_year += (
-                end_date - max(start_date, day_one_year_ago)
-            ).days
-
-    return DaysSummary(
-        total_days=total_days,
-        total_full_days=total_full_days,
-        total_days_past_year=total_days_past_year,
-        total_full_days_past_year=total_full_days_past_year,
+def compute_travel_logs(dates: list[tuple[datetime, datetime]]) -> list[TravelLog]:
+    return sorted(
+        [
+            TravelLog(
+                start_date=start_date,
+                end_date=end_date,
+                total_days_outside=(end_date - start_date).days + 1,
+                full_days_outside=max(0, (end_date - start_date).days - 1),
+            )
+            for start_date, end_date in dates
+        ],
+        key=lambda x: x.start_date,
     )
+
+
+def get_past_year_dates(
+    dates: list[tuple[datetime, datetime]]
+) -> list[tuple[datetime, datetime]]:
+    today = datetime.today()
+    one_year_ago = today - timedelta(days=365)
+    return [
+        (max(start_date, one_year_ago), end_date)
+        for start_date, end_date in dates
+        if end_date >= one_year_ago
+    ]
+
+
+def tabulate(table: list[list[str]], headers=list[str]) -> None:
+    col_width = [max(len(x) for x in col) for col in zip(*table)]
+    for line in table:
+        print(
+            "| "
+            + " | ".join("{:{}}".format(x, col_width[i]) for i, x in enumerate(line))
+            + " |"
+        )
+
+
+def pretty_printer(travel_log: list[TravelLog]):
+    print("===========" * 5)
+    print()
+    table = [
+        [
+            travel_log.start_date.strftime("%d %b %Y"),
+            travel_log.end_date.strftime("%d %b %Y"),
+            travel_log.total_days_outside,
+            travel_log.full_days_outside,
+        ]
+        for travel_log in travel_log
+    ]
+    headers = [
+        "Start Date",
+        "End Date",
+        "Total Days Outside UK",
+        "Full Days Outside UK",
+    ]
+    table = [headers] + table
+
+    col_width = [max(len(str(x)) for x in col) for col in zip(*table)]
+    for line in table:
+        print(
+            "| "
+            + " | ".join("{:{}}".format(x, col_width[i]) for i, x in enumerate(line))
+            + " |"
+        )
+
+    print()
+    print(
+        f"Total Days Outside UK: {sum(travel_log.total_days_outside for travel_log in travel_log)}"
+    )
+    print(
+        f"Full Days Outside UK: {sum(travel_log.full_days_outside for travel_log in travel_log)}"
+    )
+    print()
+    print("===========" * 5)
+    print()
 
 
 def main() -> None:
@@ -127,17 +159,16 @@ def main() -> None:
     )
 
     args = parser.parse_args()
-    days_summary = compute_days_summary(parse_dates(args.file))
 
-    print()
-    print("-" * 50)
-    print(
-        f"Total full days spent outside of the UK: {days_summary.total_full_days} ({days_summary.total_days} including travel days)"
-    )
-    print(
-        f"Total full days spent outside of the UK in the past year: {days_summary.total_full_days_past_year} ({days_summary.total_days_past_year} including travel days)"
-    )
-    print("-" * 50)
+    dates = parse_dates(args.file)
+    travel_logs = compute_travel_logs(dates)
+    travel_logs_past_year = compute_travel_logs(get_past_year_dates(dates))
+
+    print("ALL DATES:")
+    pretty_printer(travel_logs)
+
+    print("PAST YEAR DATES:")
+    pretty_printer(travel_logs_past_year)
 
 
 if __name__ == "__main__":
