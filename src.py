@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 
 
@@ -60,20 +61,22 @@ def parse_dates(filepath: str) -> list[tuple[datetime, datetime]]:
     return dates
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Script to count the number of days spent outside of the UK as provided in the input file"
-    )
-    parser.add_argument(
-        "--file",
-        "-f",
-        type=str,
-        required=True,
-        help="Input file containing the travel dates. See an example in the test file",
-    )
-    args = parser.parse_args()
+@dataclass
+class DaysSummary:
+    total_days: int
+    total_full_days: int
+    total_days_past_year: int
+    total_full_days_past_year: int
 
-    dates = parse_dates(args.file)
+
+def compute_days_summary(dates: list[tuple[datetime, datetime]]) -> DaysSummary:
+    """
+    Compute the total number of days spent outside of the UK as provided in the input file.
+    Args:
+        dates (list[tuple[datetime, datetime]]): A list of tuples, where each tuple contains the start and end dates as datetime objects.
+    Returns:
+        DaysSummary: An object containing the total number of days spent outside of the UK.
+    """
 
     total_days = 0
     total_full_days = 0  # The government website only counts full days
@@ -103,13 +106,36 @@ def main() -> None:
                 end_date - max(start_date, day_one_year_ago)
             ).days
 
+    return DaysSummary(
+        total_days=total_days,
+        total_full_days=total_full_days,
+        total_days_past_year=total_days_past_year,
+        total_full_days_past_year=total_full_days_past_year,
+    )
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Script to count the number of days spent outside of the UK as provided in the input file"
+    )
+    parser.add_argument(
+        "--file",
+        "-f",
+        type=str,
+        required=True,
+        help="Input file containing the travel dates. See an example in the test file",
+    )
+
+    args = parser.parse_args()
+    days_summary = compute_days_summary(parse_dates(args.file))
+
     print()
     print("-" * 50)
     print(
-        f"Total full days spent outside of the UK: {total_full_days} ({total_days} including travel days)"
+        f"Total full days spent outside of the UK: {days_summary.total_full_days} ({days_summary.total_days} including travel days)"
     )
     print(
-        f"Total full days spent outside of the UK in the past year: {total_full_days_past_year} ({total_days_past_year} including travel days)"
+        f"Total full days spent outside of the UK in the past year: {days_summary.total_full_days_past_year} ({days_summary.total_days_past_year} including travel days)"
     )
     print("-" * 50)
 
