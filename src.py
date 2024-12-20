@@ -10,6 +10,7 @@ def parse_date(date_str: str) -> datetime:
     The function supports two formats:
     - "%d %b %Y" (e.g., "01 Jan 2022")
     - "%d %B %Y" (e.g., "01 January 2022")
+    - "%d/%m/%Y" (e.g., "01/01/2022")
     Args:
         date_str (str): The date string to be parsed.
     Returns:
@@ -18,7 +19,7 @@ def parse_date(date_str: str) -> datetime:
 
     date_str = date_str.strip()
     # https://strftime.org/ cheat sheet for date format
-    for fmt in ["%d %b %Y", "%d %B %Y"]:
+    for fmt in ["%d %b %Y", "%d %B %Y", "%d/%m/%Y"]:
         try:
             return datetime.strptime(date_str, fmt)
         except ValueError:
