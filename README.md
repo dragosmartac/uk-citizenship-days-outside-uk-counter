@@ -11,6 +11,11 @@ The UK Citizenship application has several eligibility requirements that must be
 
 *These have been taken from the webside linked above on Fri 20 Dec 2024. Please do check them in the official source.*
 
+## Disclaimer
+
+DISCLAIMER: Always do your own due diligence when wirting your application. This is a simple utility tool. I accept no responsibility for any errors this calculator produces.
+
+
 
 ## Usage
 
@@ -18,6 +23,7 @@ The UK Citizenship application has several eligibility requirements that must be
 python3 src.py -f example/data.txt
 ```
 
+```
 ALL DATES:
 =======================================================
 
@@ -44,6 +50,7 @@ Total Days Outside UK: 23
 Full Days Outside UK: 17
 
 =======================================================
+```
 
 *Note: the day one year ago is computed by substracting from the current date 365 days*
 
