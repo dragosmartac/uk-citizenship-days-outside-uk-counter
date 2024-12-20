@@ -5,11 +5,42 @@ from datetime import datetime, timedelta
 
 
 def parse_date(date_str: str) -> datetime:
+    """
+    Parse a date string into a datetime object.
+    The function supports two formats:
+    - "%d %b %Y" (e.g., "01 Jan 2022")
+    - "%d %B %Y" (e.g., "01 January 2022")
+    Args:
+        date_str (str): The date string to be parsed.
+    Returns:
+        datetime: A datetime object representing the input date.
+    """
+
     date_str = date_str.strip()
-    return datetime.strptime(date_str, "%d %b %Y")
+    # https://strftime.org/ cheat sheet for date format
+    for fmt in ["%d %b %Y", "%d %B %Y"]:
+        try:
+            return datetime.strptime(date_str, fmt)
+        except ValueError:
+            pass
+    # If none of the formats match, raise an error
+    raise ValueError(
+        "Invalid date format. Supported formats are 'DD MMM YYYY' and 'DD Month YYYY'."
+    )
 
 
 def parse_dates(filepath: str) -> list[tuple[datetime, datetime]]:
+    """
+    Parse a file containing date ranges into a list of tuples.
+    The file is expected to have one date range per line, with the start and end dates separated by a hyphen.
+    Args:
+        filepath (str): The path to the file containing the date ranges.
+    Returns:
+        list[tuple[datetime, datetime]]: A list of tuples, where each tuple contains the start and end dates as datetime objects.
+    Raises:
+        AssertionError: If a start date is after its corresponding end date.
+    """
+
     with open(filepath, "r") as f:
         lines = f.readlines()
 
