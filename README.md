@@ -46,3 +46,17 @@ Full Days Outside UK: 17
 =======================================================
 
 *Note: the day one year ago is computed by substracting from the current date 365 days*
+
+## Tests
+
+```
+python3 test_src.py
+```
+
+```
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.004s
+
+OK
+```
