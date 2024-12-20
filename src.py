@@ -26,7 +26,7 @@ def parse_date(date_str: str) -> datetime:
             pass
     # If none of the formats match, raise an error
     raise ValueError(
-        "Invalid date format. Supported formats are 'DD MMM YYYY' and 'DD Month YYYY'."
+        f"Invalid date format for {date_str}. Supported formats are 'DD MMM YYYY', 'DD Month YYYY' and 'DD/MM/YYYY."
     )
 
 
